@@ -14,7 +14,8 @@ Copy `ticket.sh` to your local system and source it in your `.profile` or
 
 Location of tickets is stored in `$TICKETS` path. If this variable is not set
 in your `.bashrc` or provided while using `ticket` the system will create a
-tickets folder `$HOME/tickets`.
+tickets folder `$HOME/tickets`. You could export `$TICKETS` variable when you
+are sourcing the file.
 
 ## Usage
 
@@ -22,10 +23,10 @@ tickets folder `$HOME/tickets`.
 # Without any parameters help is displayed
 $ ticket -h
 Usage: ticket [option]
- -n, -new          creates a new ticket
- -o, -open         lists open tickets
- -c, -closed       lists closed tickets
- -h, -help         shows this help
+  -n, -new          creates a new ticket
+  -o, -open         lists open tickets
+  -c, -closed       lists closed tickets
+  -h, -help         shows this help
 
 # Creates new ticket and opens the ticket in your default editor
 # defined in $EDITOR.

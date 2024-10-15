@@ -40,10 +40,10 @@ ticket() {
 			;;
 		-h|-help)
 			echo "Usage: ticket [option]"
-			echo " -n, -new          creates a new ticket"
-			echo " -o, -open         lists open tickets"
-			echo " -c, -closed       lists closed tickets"
-			echo " -h, -help         shows this help"
+			echo "  -n, -new          creates a new ticket"
+			echo "  -o, -open         lists open tickets"
+			echo "  -c, -closed       lists closed tickets"
+			echo "  -h, -help         shows this help"
 			;;
 		*)
 			if [ -e "$TICKETS/$1" ] && [ -f "$TICKETS/$1" ]; then
