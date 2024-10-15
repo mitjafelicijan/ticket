@@ -4,16 +4,16 @@ Inspired by https://joearms.github.io/published/2014-06-25-minimal-viable-progra
 
 > [!NOTE]
 > This is a fun little experiment how a system like this would work. This could
-> be used with placing tickets in Git repository and share it with others and
-> have a centralized way of handling tickets.
+> be used with placing tickets in Git a repository and share it with others and
+> have a centralized way of handling tickets. Maybe?
 
 ## Installation
 
 Copy `ticket.sh` to your local system and source it in your `.profile` or
 `.bashrc`. This will expose `ticket` function as a command in your shell.
 
-Location of tickets is stored in `$TICKETS` path. If this variable is not set
-in your `.bashrc` or provided while using `ticket` the system will create a
+Location of tickets is stored in `$TICKETS` variable. If this variable is not
+set in your `.bashrc` or provided while using `ticket` the system will create a
 tickets folder `$HOME/tickets`. You could export `$TICKETS` variable when you
 are sourcing the file.
 
@@ -41,4 +41,7 @@ $ ticket -o
 # Open a ticket in your $EDITOR where ID is listed with `ticket -o`
 # or `ticket -c`.
 ticket ypRMnfGZuw
+
+# Provide custom path to tickets directory.
+TICKETS=~/my-tickets tickets -o
 ```
