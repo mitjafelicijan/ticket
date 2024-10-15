@@ -1,6 +1,11 @@
 #!/bin/bin/env bash
 
 ticket() {
+	if [ "$(uname -s)" != "Linux" ]; then
+		printf "Currently only Linux is supported.\n"
+		return 1
+	fi
+
 	if [ -z "$TICKETS" ]; then
 		TICKETS="$HOME/tickets"
 	fi
@@ -14,44 +19,45 @@ ticket() {
 
 	case $1 in
 		-n|-new)
-			new_id=$(tr -dc 'a-zA-Z0-9' < /dev/urandom | fold -w 10 | head -n 1)
-			echo "id: ${new_id}" > $TICKETS/$new_id
-			echo "responsible: `whoami`@`hostname`" >> $TICKETS/$new_id
-			echo "created: `date`" >> $TICKETS/$new_id
-			echo "status: open" >> $TICKETS/$new_id
-			echo "title: ?" >> $TICKETS/$new_id
-			echo "----" >> $TICKETS/$new_id
-			echo "Describe your problem here" >> $TICKETS/$new_id
-			$EDITOR $TICKETS/$new_id
+			ticket_id=$(tr -dc 'a-zA-Z0-9' < /dev/urandom | fold -w 12 | head -n 1)
+			ticket_file=$TICKETS/$ticket_id
+			printf "id: %s\n" $ticket_id > $ticket_file
+			printf "responsible: %s\n" `whoami`@`hostname` >> $ticket_file
+			printf "created: %s\n" "`date`" >> $ticket_file
+			printf "status: open\n" >> $ticket_file
+			printf "title: ?\n" >> $ticket_file
+			printf "====\n" >> $ticket_file
+			printf "Describe your problem here\n" >> $ticket_file
+			$EDITOR $ticket_file
 			;;
 		-o|-open)
 			grep --color=never -l 'status: open' $TICKETS/* | while read file; do
-				id=$(head -n 1 "$file" | tail -n 1 | awk '{ print $2 }')
-				title=$(head -n 5 "$file" | tail -n 1 | awk '{$1=""; print $0}')
-				printf "%s\t%s\n" "$id" "$title"
-			done
-			;;
-		-c|-closed)
-			grep --color=never -l 'status: closed' $TICKETS/* | while read file; do
-				id=$(head -n 1 "$file" | tail -n 1 | awk '{ print $2 }')
-				title=$(head -n 5 "$file" | tail -n 1 | awk '{$1=""; print $0}')
-				printf "%s\t%s\n" "$id" "$title"
-			done
-			;;
-		-h|-help)
-			echo "Usage: ticket [option]"
-			echo "  -n, -new          creates a new ticket"
-			echo "  -o, -open         lists open tickets"
-			echo "  -c, -closed       lists closed tickets"
-			echo "  -h, -help         shows this help"
-			;;
-		*)
-			if [ -e "$TICKETS/$1" ] && [ -f "$TICKETS/$1" ]; then
-				$EDITOR "$TICKETS/$1"
-			else
-				echo "Ticket not found: $TICKETS/$1"
-			fi
-			;;
-	esac
+			id=$(head -n 1 "$file" | tail -n 1 | awk '{ print $2 }')
+			title=$(head -n 5 "$file" | tail -n 1 | awk '{$1=""; print $0}')
+			printf "%s\t%s\n" "$id" "$title"
+		done
+		;;
+	-c|-closed)
+		grep --color=never -l 'status: closed' $TICKETS/* | while read file; do
+		id=$(head -n 1 "$file" | tail -n 1 | awk '{ print $2 }')
+		title=$(head -n 5 "$file" | tail -n 1 | awk '{$1=""; print $0}')
+		printf "%s\t%s\n" "$id" "$title"
+	done
+	;;
+-h|-help)
+	printf "Usage: ticket [option]\n"
+	printf "  -n, -new          creates a new ticket\n"
+	printf "  -o, -open         lists open tickets\n"
+	printf "  -c, -closed       lists closed tickets\n"
+	printf "  -h, -help         shows this help\n"
+	;;
+*)
+	if [ -e "$TICKETS/$1" ] && [ -f "$TICKETS/$1" ]; then
+		$EDITOR "$TICKETS/$1"
+	else
+		printf "Ticket not found: $TICKETS/$1\n"
+	fi
+	;;
+esac
 }
 
