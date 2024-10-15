@@ -1,15 +1,19 @@
-#!/bin/sh
-
-# Inspired by https://joearms.github.io/published/2014-06-25-minimal-viable-program.html.
-
-if [ -z "$TICKETS" ]; then
-	TICKETS="$HOME/tickets"
-fi
+#!/bin/bin/env bash
 
 ticket() {
+	if [ -z "$TICKETS" ]; then
+		TICKETS="$HOME/tickets"
+	fi
+
 	mkdir -p $TICKETS
-	case "$1" in
-		"new")
+
+	if [ -z "$1" ]; then
+		echo "`ticket -h`"
+		return 0
+	fi
+
+	case $1 in
+		-n|-new)
 			new_id=$(tr -dc 'a-zA-Z0-9' < /dev/urandom | fold -w 10 | head -n 1)
 			echo "id: ${new_id}" > $TICKETS/$new_id
 			echo "responsible: `whoami`@`hostname`" >> $TICKETS/$new_id
@@ -20,21 +24,33 @@ ticket() {
 			echo "Describe your problem here" >> $TICKETS/$new_id
 			$EDITOR $TICKETS/$new_id
 			;;
-		"open")
+		-o|-open)
 			grep --color=never -l 'status: open' $TICKETS/* | while read file; do
-				head -n 5 "$file" | tail -n 1
+				id=$(head -n 1 "$file" | tail -n 1 | awk '{ print $2 }')
+				title=$(head -n 5 "$file" | tail -n 1 | awk '{$1=""; print $0}')
+				printf "%s\t%s\n" "$id" "$title"
 			done
 			;;
-		"closed")
+		-c|-closed)
 			grep --color=never -l 'status: closed' $TICKETS/* | while read file; do
-				head -n 5 "$file" | tail -n 1
+				id=$(head -n 1 "$file" | tail -n 1 | awk '{ print $2 }')
+				title=$(head -n 5 "$file" | tail -n 1 | awk '{$1=""; print $0}')
+				printf "%s\t%s\n" "$id" "$title"
 			done
+			;;
+		-h|-help)
+			echo "Usage: ticket [option]"
+			echo " -n, -new          creates a new ticket"
+			echo " -o, -open         lists open tickets"
+			echo " -c, -closed       lists closed tickets"
+			echo " -h, -help         shows this help"
 			;;
 		*)
-			echo "Usage: ticket [option]"
-			echo "  new        creates a new ticket"
-			echo "  open       lists open tickets"
-			echo "  closed     lists closed tickets"
+			if [ -e "$TICKETS/$1" ] && [ -f "$TICKETS/$1" ]; then
+				$EDITOR "$TICKETS/$1"
+			else
+				echo "Ticket not found: $TICKETS/$1"
+			fi
 			;;
 	esac
 }
